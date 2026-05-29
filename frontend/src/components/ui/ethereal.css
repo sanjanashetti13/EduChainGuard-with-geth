@@ -1,0 +1,233 @@
+/* Scoped layout for ScrollHero — works alongside existing Tailwind build */
+
+.scroll-hero {
+  position: relative;
+  min-height: 100%;
+  overflow-x: clip;
+  background-color: #0a0a0a;
+  color: #fafafa;
+}
+
+.hero-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  display: block;
+}
+
+.hero-section {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 1.5rem 4rem;
+}
+
+.section-content {
+  max-width: 42rem;
+  text-align: center;
+}
+
+.section-headline {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+}
+
+.section-subheadline {
+  font-size: clamp(1rem, 2.5vw, 1.35rem);
+  font-weight: 500;
+  opacity: 0.88;
+  margin-bottom: 1rem;
+  color: rgb(167 169 253);
+}
+
+.section-body {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  line-height: 1.65;
+  opacity: 0.82;
+}
+
+.nav-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 10, 0.75),
+    rgba(10, 10, 10, 0)
+  );
+  backdrop-filter: blur(8px);
+}
+
+.nav-inner {
+  max-width: 72rem;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-logo {
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+}
+
+.nav-menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.nav-extras {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: 0.75rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+a.nav-extra-link {
+  padding: 0.35rem 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 9999px;
+  color: rgb(167 253 217);
+  text-decoration: none;
+  border: 1px solid rgba(6, 255, 165, 0.45);
+  background: rgba(6, 255, 165, 0.08);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+a.nav-extra-link:hover {
+  color: #0a0a0a;
+  background: rgb(167 253 217);
+}
+
+.ethereal-accent-strip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 99997;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgb(99, 102, 241),
+    rgb(139, 92, 246),
+    rgb(236, 72, 153),
+    rgb(6, 255, 165)
+  );
+  background-size: 200% 100%;
+  animation: ethereal-accent-shift 8s ease-in-out infinite;
+}
+
+.nav-item {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 9999px;
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: none;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  color: #fff;
+  background: rgba(99, 102, 241, 0.25);
+}
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 3px;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.08);
+  z-index: 15;
+}
+
+.scroll-progress-bar {
+  width: 100%;
+  height: 100%;
+  transform-origin: top center;
+  transform: scaleY(0);
+  background: linear-gradient(
+    to bottom,
+    rgb(99, 102, 241),
+    rgb(236, 72, 153),
+    rgb(6, 255, 165)
+  );
+}
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0a;
+  opacity: 1;
+  pointer-events: all;
+  transition: opacity 0.6s ease;
+}
+
+.loading-overlay.loaded {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-text {
+  font-size: 0.75rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  animation: ethereal-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes ethereal-accent-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes ethereal-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+:root {
+  --scroll-progress: 0;
+}

@@ -1,0 +1,11 @@
+{
+  "name": "educhainguard-blockchain",
+  "private": true,
+  "scripts": {
+    "compile": "truffle compile",
+    "migrate": "truffle migrate"
+  },
+  "devDependencies": {
+    "truffle": "^5.11.5"
+  }
+}

@@ -1,0 +1,23 @@
+INFO [05-05|00:09:14.502] Maximum peer count                       ETH=50 LES=0 total=50
+INFO [05-05|00:09:14.505] Set global gas cap                       cap=50,000,000
+INFO [05-05|00:09:14.506] Allocated trie memory caches             clean=154.00MiB dirty=256.00MiB
+INFO [05-05|00:09:14.506] Allocated cache and file handles         database=c:\KLE\KLE_Projects\EduChainGuard\blockchain\gethdata\geth\chaindata cache=512.00MiB handles=8192
+INFO [05-05|00:09:14.526] Opened ancient database                  database=c:\KLE\KLE_Projects\EduChainGuard\blockchain\gethdata\geth\chaindata\ancient readonly=false
+INFO [05-05|00:09:14.527] Initialised chain configuration          config="{ChainID: 1337 Homestead: 0 DAO: <nil> DAOSupport: false EIP150: 0 EIP155: 0 EIP158: 0 Byzantium: 0 Constantinople: 0 Petersburg: 0 Istanbul: 0, Muir Glacier: <nil>, Berlin: 0, London: 0, Engine: unknown}"
+INFO [05-05|00:09:14.530] Disk storage enabled for ethash caches   dir=c:\KLE\KLE_Projects\EduChainGuard\blockchain\gethdata\geth\ethash count=3
+INFO [05-05|00:09:14.530] Disk storage enabled for ethash DAGs     dir=C:\Users\sanja\AppData\Local\Ethash count=2
+INFO [05-05|00:09:14.530] Initialising Ethereum protocol           network=1337 dbversion=8
+INFO [05-05|00:09:14.533] Loaded most recent local header          number=1816 hash=8a399b..368317 td=325,830,713 age=20m20s
+INFO [05-05|00:09:14.533] Loaded most recent local full block      number=1816 hash=8a399b..368317 td=325,830,713 age=20m20s
+INFO [05-05|00:09:14.533] Loaded most recent local fast block      number=1816 hash=8a399b..368317 td=325,830,713 age=20m20s
+INFO [05-05|00:09:14.538] Loaded local transaction journal         transactions=0 dropped=0
+INFO [05-05|00:09:14.539] Regenerated local transaction journal    transactions=0 accounts=0
+WARN [05-05|00:09:14.539] Switch sync mode from fast sync to full sync 
+INFO [05-05|00:09:14.540] Gasprice oracle is ignoring threshold set threshold=2
+WARN [05-05|00:09:14.541] Unclean shutdown detected                booted=2026-05-04T23:59:50+0530 age=9m24s
+WARN [05-05|00:09:14.541] Unclean shutdown detected                booted=2026-05-05T00:01:55+0530 age=7m19s
+WARN [05-05|00:09:14.541] Unclean shutdown detected                booted=2026-05-05T00:06:50+0530 age=2m24s
+INFO [05-05|00:09:14.541] Starting peer-to-peer node               instance=Geth/v1.10.8-stable-26675454/windows-amd64/go1.16.4
+INFO [05-05|00:09:14.570] New local node record                    seq=10 id=662240a3207236f4 ip=127.0.0.1 udp=30304 tcp=30304
+INFO [05-05|00:09:14.571] Started P2P networking                   self=enode://659b7160abc1e9fdc33aa0ba93d179c82a54f8a3c174159136756035dbaf55f7c297e110e5bfa65062fec23b29980e9e61cc00ab05403b819aad528f458d4441@127.0.0.1:30304
+WARN [05-05|00:09:14.572] IPC opening failed                       url=\\.\pipe\geth.ipc error="Access is denied."

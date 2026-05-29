@@ -1,0 +1,24 @@
+/* Scoped theme tokens for glass auth UI — matches shadcn-style variable names */
+.auth-app {
+  --background: #0c0c0f;
+  --foreground: #f4f4f5;
+  --card: rgba(22, 22, 28, 0.85);
+  --card-foreground: #fafafa;
+  --border: rgba(255, 255, 255, 0.12);
+  --muted-foreground: rgba(244, 244, 245, 0.55);
+  --primary: #6366f1;
+  --primary-foreground: #fafafa;
+  --destructive: #f87171;
+  --color-primary: #6366f1;
+  --color-secondary: #8b5cf6;
+  --color-accent: #06ffa5;
+  --color-chart-1: #818cf8;
+  --color-chart-3: #c084fc;
+  --color-chart-4: #f472b6;
+  --color-chart-5: #34d399;
+}
+
+.auth-app.dark,
+.auth-app {
+  color-scheme: dark;
+}

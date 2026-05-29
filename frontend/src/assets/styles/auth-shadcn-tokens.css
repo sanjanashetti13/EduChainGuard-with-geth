@@ -1,0 +1,32 @@
+/* shadcn-style tokens: :root so Button/Input always resolve; .auth-app adds full page chrome */
+:root {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: rgba(24, 24, 27, 0.9);
+  --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+  --primary: #e4e4e7;
+  --primary-foreground: #09090b;
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  --muted: #18181b;
+  --muted-foreground: #a1a1aa;
+  --accent: #3f3f46;
+  --accent-foreground: #fafafa;
+  --destructive: #ef4444;
+  --destructive-foreground: #fef2f2;
+  --border: rgba(255, 255, 255, 0.12);
+  --input: rgba(255, 255, 255, 0.14);
+  --ring: #a78bfa;
+  --radius: 0.75rem;
+}
+
+.auth-app {
+  --background: #030303;
+  --foreground: #fafafa;
+  --card: rgba(24, 24, 27, 0.94);
+  --primary: #f4f4f5;
+  --primary-foreground: #09090b;
+  color-scheme: dark;
+}

@@ -1,0 +1,439 @@
+================================================================================
+  EDUCHAINGUARD — DETAILED TASK CHECKLIST (COMPLETE THE PROJECT / ASSIGNMENT)
+================================================================================
+
+This file lists everything you need to do, in order, to finish local blockchain
+demo work, Truffle deploy, MetaMask + React path, and keep your existing
+Flask + MongoDB + Polygon Amoy path working.
+
+Section 0 below lists what is ALREADY implemented in the codebase so you can
+tell “done in repo” apart from “still on my machine / my secrets.”
+
+Your machine: Windows (PowerShell). Paths use your project folder:
+  ...\Blockchain\EduChainGuard\
+
+================================================================================
+SECTION 0 — ALREADY DONE IN THIS REPOSITORY (CODE / STRUCTURE)
+================================================================================
+
+The following was implemented in the EduChainGuard codebase. You do NOT need
+to redo these parts unless you change requirements or break something on
+purpose. You still must run services, configure secrets, deploy to your local
+node, and set env vars (see Sections A–K).
+
+--- FRONTEND (React / Create React App) ---
+
+  F0.1  Dependency added: "ethers" in frontend\package.json
+
+  F0.2  New file: frontend\src\utils\blockchain.js
+        - Detects MetaMask (window.ethereum)
+        - connectWallet() — BrowserProvider, eth_requestAccounts, signer
+        - getContract() — resolves address from chain (1337 = local, 80002 =
+          Amoy) using REACT_APP_* env vars
+        - uploadCertificate(hashHex, signer) — contract uploadCertificate(bytes32)
+        - verifyCertificate(hashHex, providerOrSigner) — view call
+        - hashFileSha256Hex(file) — matches backend SHA-256 of file bytes
+        - hexSha256ToBytes32() — packs 64-char hex digest for Solidity bytes32
+        - ensureChain(), addOrSwitchNetwork() — MetaMask network switch/add
+        - Constants: CHAIN_ID_GETH_LOCAL = 1337, CHAIN_ID_POLYGON_AMOY = 80002
+        - Network presets: "Geth Local" (RPC http://127.0.0.1:8545) and
+          Polygon Amoy (public RPC)
+
+  F0.3  New file: frontend\src\abis\CertificateStorage.json
+        - Contains contractName + abi[] aligned with backend\contract_abi.json
+        - After you change Solidity and recompile, sync the "abi" from
+          blockchain\build\contracts\CertificateStorage.json if needed (Section H)
+
+  F0.4  Modified: frontend\src\components\Navbars\AdminNavbar.js
+        - "Connect Wallet" / "Reconnect" button
+        - Displays shortened connected address when available
+        - "Geth Local" and "Amoy" buttons to add or switch MetaMask networks
+        - Listens for accountsChanged / chainChanged on window.ethereum
+
+  F0.5  Modified: frontend\src\views\admin\UploadCertificate.js
+        - Checkbox: "Use MetaMask (Local Geth)"
+        - OFF: unchanged — FormData POST to http://localhost:5000/institute/upload
+          (Flask hashes PDF, signs on Amoy, writes MongoDB)
+        - ON: connect wallet, switch to chain 1337, hash file in browser, call
+          contract via ethers (no Mongo insert on this path)
+
+  F0.6  Modified: frontend\src\views\verifier\VerifyCertificate.js
+        - Same "Use MetaMask (Local Geth)" toggle
+        - OFF: unchanged — POST to http://localhost:5000/verifier/verify-pdf
+        - ON: verify on local contract via MetaMask on chain 1337
+
+--- BLOCKCHAIN / TRUFFLE (outside React src) ---
+
+  T0.1  Folder created: blockchain\  (not mixed with frontend\src)
+
+  T0.2  blockchain\contracts\CertificateStorage.sol
+        - Matches your existing ABI shape (uploadCertificate, verifyCertificate,
+          certificateHashes mapping, owner, CertificateUploaded event)
+
+  T0.3  blockchain\contracts\Migrations.sol + migrations\1_initial_migration.js
+        - Standard Truffle migration scaffold
+
+  T0.4  blockchain\migrations\2_deploy_certificate_storage.js
+        - Deploys CertificateStorage
+
+  T0.5  blockchain\truffle-config.js
+        - network "development": host 127.0.0.1, port 8545, network_id "*"
+
+  T0.6  blockchain\package.json — Truffle devDependency + npm scripts
+
+  T0.7  blockchain\.gitignore — ignores node_modules\ and build\
+
+  T0.8  blockchain\genesis.json — chainId 1337 (for local Geth init aligned with
+        the frontend "Geth Local" network)
+
+  T0.9  In this workspace, "npx truffle compile" was run successfully once;
+        artifacts appear under blockchain\build\contracts\ after compile.
+        Your machine: run compile/migrate yourself whenever you change contracts
+        or use a fresh Geth datadir.
+
+--- BACKEND ---
+
+  B0.1  No breaking changes were made to your Flask routes or MongoDB usage for
+        the original flows (toggle OFF). app.py, /upload, /verify, /institute/*,
+        /verifier/*, admin routes — structure preserved as in your project.
+
+--- DOCUMENTATION IN THIS REPO ---
+
+  D0.1  This file: TASKS_CHECKLIST.txt — step-by-step for you to finish runtime
+        setup, Geth, migrate, .env, and demos.
+
+--- WHAT IS *NOT* AUTOMATIC (YOU STILL DO THESE) ---
+
+  - Install/run: Node, Python, MongoDB, Geth, MetaMask (Section A).
+  - Create and fill backend\.env (Amoy keys, contract address) — yours to keep
+    secret (Section B).
+  - Run Geth with your datadir, init genesis, fund/unlock accounts (Section C).
+  - truffle migrate against your running node; copy new address to
+    frontend\.env.local as REACT_APP_CONTRACT_ADDRESS_LOCAL (Sections D–E).
+  - Create frontend\.env.local (not committed by default) — Section E.
+  - Align chain ID with your teacher if they require 4321 from the PDF vs
+    1337 in this repo (Section G).
+
+================================================================================
+SECTION A — INSTALL SOFTWARE (ONE-TIME)
+================================================================================
+
+A1. Node.js (LTS)
+    - Needed for: React frontend, Truffle (in /blockchain).
+    - Verify:  node -v   and   npm -v
+
+A2. Python 3 + pip
+    - Needed for: Flask backend.
+    - Verify:  py -3 --version
+
+A3. MongoDB Community Server (running as a service or manual mongod)
+    - Backend connects to: mongodb://localhost:27017/
+    - Database name: EduChainGuard
+    - Verify: MongoDB Compass or mongosh can connect to localhost:27017
+
+A4. MetaMask browser extension
+    - Chrome / Edge / Firefox — install from official MetaMask site.
+
+A5. Geth (Go Ethereum) for Windows
+    - Download from: https://geth.ethereum.org/downloads
+    - Add geth.exe folder to PATH, OR run geth with full path.
+    - Verify:  geth version
+
+A6. Git (optional but useful)
+    - Only if you use version control.
+
+================================================================================
+SECTION B — BACKEND (FLASK + MONGODB + AMOY) — MUST STAY WORKING
+================================================================================
+
+B1. Backend folder
+    Location:  EduChainGuard\backend\
+
+B2. Python virtual environment (recommended)
+    cd backend
+    py -3 -m venv venv
+    .\venv\Scripts\Activate.ps1
+    pip install -r requirements.txt
+    (If requirements.txt is missing, install: flask flask-cors pymongo
+     python-dotenv web3 bcrypt google-auth werkzeug)
+
+B3. Environment file: backend\.env
+    Create or edit .env with at least:
+      CONTRACT_ADDRESS=<your CertificateStorage on Polygon Amoy, checksummed>
+      WALLET_ADDRESS=<server wallet that pays gas on Amoy>
+      PRIVATE_KEY=<that wallet’s private key — NEVER commit to git>
+    These must match how you already deployed on Amoy.
+
+B4. contract_abi.json
+    Must stay in backend\ and match your contract’s ABI.
+    If you only change Solidity in blockchain\ and redeploy Amoy, update this
+    file from Truffle build output (see Section H).
+
+B5. Start MongoDB
+    Ensure mongod is running before Flask.
+
+B6. Start Flask
+    From backend (with venv active):
+      py -3 app.py
+    Default is often http://127.0.0.1:5000
+    Frontend calls http://localhost:5000 — keep port consistent.
+
+B7. Smoke test (no Geth needed)
+    - Register/login as institute, upload PDF with toggle OFF (MetaMask local).
+    - That path uses /institute/upload → blockchain tx on Amoy + MongoDB.
+
+================================================================================
+SECTION C — LOCAL GETH (CHAIN ID 1337 — MATCHES THIS REPO)
+================================================================================
+
+IMPORTANT: Your lab PDF (Geth_SingleNode_setup_modified.pdf) uses chainId 4321.
+This EduChainGuard repo is wired for CHAIN ID 1337 in:
+  - blockchain\genesis.json
+  - frontend MetaMask “Geth Local” (see frontend\src\utils\blockchain.js)
+
+For this project, follow THIS repo’s 1337 genesis unless your teacher forces
+4321 — if they force 4321, you must change genesis + frontend chain constants
+together (ask your instructor which chain ID to submit).
+
+C1. Pick a datadir (empty folder for blockchain data)
+    Example:
+      cd "...\EduChainGuard\blockchain"
+      mkdir gethdata
+
+C2. Initialize genesis (ONCE per fresh gethdata)
+      geth --datadir .\gethdata init .\genesis.json
+
+C3. Start Geth with HTTP RPC on 8545
+    Example (adjust path to geth if not on PATH):
+
+      geth --datadir .\gethdata --http --http.addr 127.0.0.1 --http.port 8545 ^
+        --http.api eth,net,web3,personal --allow-insecure-unlock
+
+    Notes:
+    - Keep this terminal open while developing.
+    - Newer Geth versions may deprecate “personal” API — if commands fail,
+      check Geth release notes; you may need different flags or a miner setup.
+    - For a private chain you often also use --nodiscover and a matching
+      network id; for simplest class setup, matching genesis chainId 1337 is
+      the priority so MetaMask + Truffle agree.
+
+C4. Geth JavaScript console (optional, for class-style steps)
+    Attach (syntax varies by Geth version), e.g.:
+      geth attach http://127.0.0.1:8545
+    In console you can:
+      personal.newAccount("yourPassword")
+      eth.accounts
+    Keystore files are stored under:
+      <datadir>\keystore\
+    Example:  blockchain\gethdata\keystore\UTC--...json
+
+C5. Funding accounts for gas (local)
+    You need ETH on the account that will:
+    - Deploy via Truffle (migrate uses a Geth account / coinbase), OR
+    - Sign txs from MetaMask on “Geth Local”.
+    If your chain does not auto-mine, configure mining per your lab PDF
+    (miner.start) OR use a Geth version / flags your course provides.
+
+C6. MetaMask: network “Geth Local”
+    The app’s Admin navbar has buttons to add/switch networks.
+    Manual add if needed:
+      Network name:     Geth Local
+      RPC URL:          http://127.0.0.1:8545
+      Chain ID:         1337
+      Currency symbol:  ETH
+
+C7. Import / use an account
+    - MetaMask: create a new account OR import (see course rules: keystore vs
+      private key). Fund that account from a Geth account with balance.
+
+================================================================================
+SECTION D — TRUFFLE: COMPILE & DEPLOY TO LOCAL GETH
+================================================================================
+
+D1. Geth must be running (Section C) before migrate.
+
+D2. Truffle project location
+      EduChainGuard\blockchain\
+
+D3. Install Truffle deps (once)
+      cd blockchain
+      npm install
+
+D4. Compile
+      npx truffle compile
+
+D5. Configure Truffle to use the correct account for deployment
+    Truffle uses the first unlocked account on http://127.0.0.1:8545 OR you
+    may need to configure private keys in truffle-config.js depending on your
+    Geth setup. Typical class lab: unlock account in Geth, then migrate.
+
+D6. Migrate (deploy CertificateStorage)
+      npx truffle migrate --network development
+
+D7. Copy the deployed contract address
+    After migrate, note CertificateStorage address from terminal output OR open:
+      blockchain\build\contracts\CertificateStorage.json
+    Look under "networks" for the network entry → "address".
+
+================================================================================
+SECTION E — FRONTEND (REACT) — ENV + RUN
+================================================================================
+
+E1. Install dependencies (once or after package.json changes)
+      cd frontend
+      npm install
+
+E2. Create frontend\.env.local  (CRA reads REACT_APP_* variables)
+    Required for MetaMask + local Geth mode:
+
+      REACT_APP_CONTRACT_ADDRESS_LOCAL=0x...paste CertificateStorage from D7...
+
+    Optional (only if you call contract from wallet on Amoy in future):
+
+      REACT_APP_CONTRACT_ADDRESS_AMOY=0x...same as backend CONTRACT_ADDRESS...
+
+    Restart npm start after ANY change to .env.local.
+
+E3. Start React dev server
+      npm start
+
+E4. What the UI does (two modes)
+    Admin navbar:
+      - “Connect Wallet” — requests MetaMask accounts, shows shortened address.
+      - “Geth Local” / “Amoy” — switches or adds those networks in MetaMask.
+
+    Upload page + Verify page:
+      - Checkbox “Use MetaMask (Local Geth)”
+          ON  → browser hashes file (SHA-256), MetaMask signs tx / read call on
+                chain ID 1337 using REACT_APP_CONTRACT_ADDRESS_LOCAL.
+          OFF → existing Flask + Amoy + Mongo paths unchanged.
+
+    Important: MetaMask local upload does NOT write to MongoDB (by design in
+    this project). Flask path still does.
+
+================================================================================
+SECTION F — END-TO-END DEMO SCRIPT (WHAT TO SHOW / VERIFY)
+================================================================================
+
+F1. Start MongoDB.
+
+F2. Start Flask (backend).
+
+F3. Start Geth with RPC 8545 (Section C).
+
+F4. (If fresh chain) Run truffle migrate; update REACT_APP_CONTRACT_ADDRESS_LOCAL.
+
+F5. Start React (frontend).
+
+F6. Amoy / production-style path (assignment “existing” behavior)
+    - MetaMask toggle OFF on Upload and Verify.
+    - Log in as institute / verifier as your app requires.
+    - Upload PDF → should hit Flask, Amoy tx, Mongo record.
+    - Verify PDF → Flask verifies on Amoy, logs verification if backend does.
+
+F7. Local Geth + MetaMask path (assignment “wallet” behavior)
+    - In MetaMask: switch to “Geth Local” (chain 1337), account with ETH.
+    - In app: Connect Wallet; toggle ON “Use MetaMask (Local Geth)”.
+    - Upload: confirm tx in MetaMask; note tx hash alert.
+    - Verify: should read contract on 1337 for same file hash.
+
+F8. If verify fails after upload
+    - Same network (1337), same contract address in .env.local, same file bytes
+      (hash must match what was stored on-chain).
+
+================================================================================
+SECTION G — PDF LAB (Geth_SingleNode_setup_modified.pdf) VS THIS REPO
+================================================================================
+
+G1. The PDF is Linux-oriented (apt, tar, paths like node1/).
+
+G2. On Windows, mirror the same IDEAS: init genesis, run geth on 8545,
+    console, accounts, miner, unlock, send — using Windows paths and geth.exe.
+
+G3. Chain ID mismatch:
+    PDF example: 4321
+    This repo:    1337
+    Pick one policy with your instructor before the viva.
+
+================================================================================
+SECTION H — IF YOU CHANGE THE SOLIDITY CONTRACT
+================================================================================
+
+H1. Edit:  blockchain\contracts\CertificateStorage.sol
+
+H2. Recompile:
+      cd blockchain
+      npx truffle compile
+
+H3. Update ABI used by backend + frontend:
+    - Copy "abi" array from:
+        blockchain\build\contracts\CertificateStorage.json
+      into:
+        frontend\src\abis\CertificateStorage.json   (inside the "abi" field)
+      and into:
+        backend\contract_abi.json   (raw array, as Flask expects)
+
+H4. Redeploy:
+    - Local Geth:  npx truffle migrate --network development
+      (or migrate --reset if you understand it wipes deploy state on that net)
+    - Amoy: deploy however you already do (Truffle network amoy if configured,
+      or your existing process). Update CONTRACT_ADDRESS in backend .env and
+      REACT_APP_CONTRACT_ADDRESS_AMOY if used.
+
+================================================================================
+SECTION I — OPTIONAL / SECOND PDF
+================================================================================
+
+I1. Ambient_AI_report.pdf is an internship report, not a Geth checklist.
+    No steps required for EduChainGuard unless a separate course asks for it.
+
+================================================================================
+SECTION J — TROUBLESHOOTING (COMMON ISSUES)
+================================================================================
+
+J1. “Set REACT_APP_CONTRACT_ADDRESS_LOCAL” error
+    → .env.local missing or wrong name; restart npm start.
+
+J2. MetaMask wrong chain
+    → Use navbar “Geth Local” or manually add network chain 1337.
+
+J3. Truffle migrate fails / no account
+    → Geth not running, wrong port, or no unlocked/funded deployer account.
+
+J4. Flask “Web3 is not connected to Polygon Amoy”
+    → RPC down or wrong .env; fix Amoy RPC / keys.
+
+J5. CORS errors
+    → Flask already uses CORS(app); ensure frontend URL/port matches.
+
+J6. Institute upload rejects file
+    → Backend allows .pdf for /institute/upload; use PDF for that route.
+
+================================================================================
+SECTION K — QUICK COMMAND REFERENCE (POWERSHELL)
+================================================================================
+
+  # Backend
+  cd "...\EduChainGuard\backend"
+  .\venv\Scripts\Activate.ps1
+  py -3 app.py
+
+  # Geth (from blockchain folder, after mkdir gethdata once)
+  cd "...\EduChainGuard\blockchain"
+  geth --datadir .\gethdata init .\genesis.json
+  geth --datadir .\gethdata --http --http.addr 127.0.0.1 --http.port 8545 --http.api eth,net,web3,personal --allow-insecure-unlock
+
+  # Truffle
+  cd "...\EduChainGuard\blockchain"
+  npm install
+  npx truffle compile
+  npx truffle migrate --network development
+
+  # Frontend
+  cd "...\EduChainGuard\frontend"
+  npm install
+  npm start
+
+================================================================================
+END OF CHECKLIST
+================================================================================
